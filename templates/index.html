@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+      <meta http-equiv="Expires" content="0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Cache" content="no-cache">
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-1.9.1.js') }}" ></script>
+    <link  rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.6.1/css/bootstrap.css') }}" >
+    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap-4.6.1/js/bootstrap.js') }}" ></script>
+    <title> 和ChatGPT聊天 </title>
+    <style>
+        .message {
+            padding-bottom: 15px;
+            border-bottom-style: solid;
+            border-bottom-width: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<H1  align="center" > 和ChatGPT聊天 </H1>
+
+<div class="container">
+
+    <div id="messages"  style="height: 500px;overflow-y: auto; overflow-x: hidden;padding-bottom: 30px;padding-top: 30px; border-width: 0.5px; border-style: ridge;" >
+        <div  class="message row" >
+                <div class="col-2 ">system ：</div><div  class="col-8">可以开始和 chatGPT 的聊天啦！</div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div>
+
+
+        <form>
+            <input type="hidden" id="token" name="token" value="{{ token }}" >
+             <div  class="row" >
+                <div class="col-10"> <textarea id="content" name="content" class="form-control" style="height: 120px;"  ></textarea>
+            </div>
+             <div  class="row float-right" >
+                 <button id="send" type="button" >发送</button></div>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+
+
+
+<script>
+    $(function (){
+
+        $('#send').click(function (){
+            var content = $.trim($("#content").val());
+            var token = $.trim($("#token").val());
+            if(content==""){
+                $("#content").val("")
+                $("#content").prop("placeholder","content不能为空")
+                console.log("content不能为空");
+                return
+            }
+            $("#content").val("")
+             $("#content").prop("placeholder","")
+            show('user',content)
+
+
+            msgData={'role':"user","content":content,"token":token}
+
+            ajaxJson(msgData,function (result){
+                console.log(result)
+                show(result.role,result.content)
+            })
+
+        })
+
+        function show(role,content){
+            content = content.replaceAll('\n',"<br/>")
+            $('#messages').append('<div  class="message row" ><div class="col-2 ">'+role+' ：</div><div  class="col-8">'+content+'</div></div>');
+             var scrollHeight = $('#messages').prop("scrollHeight");
+            $('#messages').animate({ scrollTop: scrollHeight }, 500);
+        }
+
+        function ajaxJson(jsonObj,callback) {
+            $.ajax({
+                type: "post",
+                url: '/chat',
+                data: JSON.stringify(jsonObj),
+                contentType: 'application/json',
+                success: function (data) {
+                    if ($.isFunction(callback)) {
+                        callback(data);
+                    }
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("发生异常啦！")
+                }
+            });
+        }
+
+    })
+</script>
+</body>
+</html>

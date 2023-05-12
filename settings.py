@@ -1,0 +1,14 @@
+JSON_AS_ASCII = False
+DEBUG=True
+
+## 上下文最多记录多少行
+CONTEXT_LINE=20
+
+
+OPENAI_API_KEY='sk-XXX'
+OPENAI_ORGANIZATION='org-XXX'
+
+HTTP_PROXY='http://127.0.0.1:10809'
+HTTPS_PROXY='http://127.0.0.1:10809'
+
+
